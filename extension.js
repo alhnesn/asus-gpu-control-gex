@@ -154,6 +154,7 @@ class GpuModeToggle extends QuickSettings.QuickMenuToggle {
         this._pendingAction = null;
         this._switching = false;
         this._pendingPollId = 0;
+        this._dialog = null;
         this._items = {};
 
         // Click the toggle body: cycle GPU mode
@@ -181,8 +182,10 @@ class GpuModeToggle extends QuickSettings.QuickMenuToggle {
                 'org.supergfxctl.Daemon',
                 '/org/supergfxctl/Gfx',
                 (proxy, error) => {
+                    if (this._destroyed)
+                        return;
                     if (error) {
-                        log(`[AsusGpuControl] SuperGfx proxy error: ${error.message}`);
+                        console.error(`[AsusGpuControl] SuperGfx proxy error: ${error.message}`);
                         this.subtitle = 'Unavailable';
                         return;
                     }
@@ -205,7 +208,7 @@ class GpuModeToggle extends QuickSettings.QuickMenuToggle {
                 Gio.DBusProxyFlags.NONE,
             );
         } catch (e) {
-            log(`[AsusGpuControl] SuperGfx proxy init error: ${e.message}`);
+            console.error(`[AsusGpuControl] SuperGfx proxy init error: ${e.message}`);
         }
     }
 
@@ -232,7 +235,7 @@ class GpuModeToggle extends QuickSettings.QuickMenuToggle {
     _fetchMode() {
         this._proxy.ModeRemote((result, error) => {
             if (error) {
-                log(`[AsusGpuControl] Get GPU mode error: ${error.message}`);
+                console.error(`[AsusGpuControl] Get GPU mode error: ${error.message}`);
                 return;
             }
             this._currentMode = result[0];
@@ -245,7 +248,7 @@ class GpuModeToggle extends QuickSettings.QuickMenuToggle {
     _fetchPending() {
         this._proxy.PendingModeRemote((result, error) => {
             if (error) {
-                log(`[AsusGpuControl] Get pending mode error: ${error.message}`);
+                console.error(`[AsusGpuControl] Get pending mode error: ${error.message}`);
                 this._clearPending();
                 return;
             }
@@ -319,10 +322,14 @@ class GpuModeToggle extends QuickSettings.QuickMenuToggle {
         // Close quick settings panel before opening modal dialog
         Main.panel.statusArea.quickSettings.menu.close();
 
-        const dialog = new GpuSwitchDialog(this._currentMode, id, (systemAction) => {
+        this._dialog = new GpuSwitchDialog(this._currentMode, id, (systemAction) => {
+            this._dialog = null;
             this._doSetMode(id, systemAction);
         });
-        dialog.open();
+        this._dialog.connect('closed', () => {
+            this._dialog = null;
+        });
+        this._dialog.open();
     }
 
     _doCancelSwitch(id) {
@@ -336,7 +343,7 @@ class GpuModeToggle extends QuickSettings.QuickMenuToggle {
             this._rebootTarget = null;
 
             if (error) {
-                log(`[AsusGpuControl] Cancel GPU mode error: ${error.message}`);
+                console.error(`[AsusGpuControl] Cancel GPU mode error: ${error.message}`);
                 Main.notify('GPU Mode', `Failed: ${error.message}`);
             }
             this._fetchMode();
@@ -354,7 +361,7 @@ class GpuModeToggle extends QuickSettings.QuickMenuToggle {
             this._switching = false;
 
             if (error) {
-                log(`[AsusGpuControl] Set GPU mode error: ${error.message}`);
+                console.error(`[AsusGpuControl] Set GPU mode error: ${error.message}`);
                 Main.notify('GPU Mode', `Failed: ${error.message}`);
                 this._fetchMode();
                 return;
@@ -450,6 +457,11 @@ class GpuModeToggle extends QuickSettings.QuickMenuToggle {
     }
 
     destroy() {
+        this._destroyed = true;
+        if (this._dialog) {
+            this._dialog.close();
+            this._dialog = null;
+        }
         this._stopPendingPoll();
         if (this._proxy) {
             if (this._notifyGfxId) {
