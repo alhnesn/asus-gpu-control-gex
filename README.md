@@ -37,19 +37,22 @@ cd asus-gpu-control-gex
 make install
 ```
 
-Then enable:
+Log out and back in, then enable:
 
 ```sh
 gnome-extensions enable asus-gpu-control@alhnesn
 ```
-
-Log out and back in to load the extension.
 
 ### From zip
 
 ```sh
 make zip
 gnome-extensions install asus-gpu-control@alhnesn.zip --force
+```
+
+Log out and back in, then enable:
+
+```sh
 gnome-extensions enable asus-gpu-control@alhnesn
 ```
 
