@@ -1,0 +1,9 @@
+{
+    "uuid": "asus-gpu-control@alhnesn",
+    "name": "ASUS GPU Control",
+    "description": "GPU mode switching (Hybrid, Integrated, MUX dGPU) for ASUS laptops using supergfxctl. Quick Settings toggle with confirmation dialogs that handle logout/reboot automatically.",
+    "shell-version": ["49"],
+    "url": "https://github.com/alhnesn/asus-gpu-control-gex",
+    "session-modes": ["user"],
+    "version-name": "1.0"
+}
