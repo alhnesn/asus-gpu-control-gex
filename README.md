@@ -4,7 +4,7 @@ GNOME Shell extension for switching GPU modes on ASUS laptops using [supergfxctl
 
 Adds a Quick Settings toggle for switching between Integrated, Hybrid, and MUX dGPU modes.
 
-Built as a GNOME 49 replacement for the now-incompatible [supergfxctl-gex](https://gitlab.com/asus-linux/supergfxctl-gex).
+Built as a GNOME 49+ replacement for the now-incompatible [supergfxctl-gex](https://gitlab.com/asus-linux/supergfxctl-gex).
 
 <img src="screenshots/toggle.png" width="300">
 
@@ -23,7 +23,7 @@ Built as a GNOME 49 replacement for the now-incompatible [supergfxctl-gex](https
 
 ## Requirements
 
-- GNOME Shell 49
+- GNOME Shell 49 or 50
 - [supergfxctl](https://gitlab.com/asus-linux/supergfxctl) with `supergfxd` running
 - ASUS laptop with supported GPU switching (tested on ASUS TUF A15 2022)
 
